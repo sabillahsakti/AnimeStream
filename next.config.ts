@@ -1,7 +1,21 @@
-import type { NextConfig } from "next";
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "**.wp.com",
+      },
+      {
+        protocol: "https",
+        hostname: "v6.animekompi.fun",
+      },
+      {
+        protocol: "http",
+        hostname: "v6.animekompi.fun",
+      },
+    ],
+  },
+}
 
-const nextConfig: NextConfig = {
-  /* config options here */
-};
-
-export default nextConfig;
+module.exports = nextConfig
