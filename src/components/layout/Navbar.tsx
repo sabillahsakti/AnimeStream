@@ -2,135 +2,102 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Search, Menu, X } from "lucide-react"
-import { useState } from "react"
+import {
+  Search,
+  Home,
+  Film,
+  Tv,
+  Tag,
+  Trophy,
+  Globe,
+  Calendar,
+} from "lucide-react"
 
 const NAV_LINKS = [
-  { href: "/", label: "Home" },
-  { href: "/anime", label: "Anime" },
-  { href: "/schedule", label: "Jadwal" },
-  { href: "/genre/action", label: "Genre" },
+  { href: "/", label: "Home", icon: Home },
+  { href: "/movies", label: "Movies", icon: Film },
+  { href: "/tv", label: "TV Series", icon: Tv },
+  { href: "/genres", label: "Genres", icon: Tag },
+  { href: "/leaderboard", label: "Leaderboard", icon: Trophy },
+  { href: "/country", label: "Country", icon: Globe },
+  { href: "/year", label: "Year", icon: Calendar },
 ]
 
 export function Navbar() {
   const pathname = usePathname()
-  const [menuOpen, setMenuOpen] = useState(false)
 
   return (
-    <header
-      style={{
-        position: "sticky",
-        top: 0,
-        zIndex: 50,
-        background: "rgba(10, 10, 11, 0.85)",
-        backdropFilter: "blur(12px)",
-        borderBottom: "1px solid var(--border)",
-      }}
-    >
-      <div
-        className="mx-auto flex items-center justify-between"
-        style={{ maxWidth: 1280, padding: "0 1.5rem", height: 60 }}
-      >
-        {/* Logo */}
-        <Link
-          href="/"
-          className="font-display text-2xl tracking-wide flex-shrink-0"
-          style={{ color: "var(--text-primary)", letterSpacing: "0.06em" }}
-        >
-          ANI<span style={{ color: "var(--accent)" }}>STREAM</span>
-        </Link>
+    <header className="fixed top-0 left-0 w-full z-50 bg-gradient-to-b from-black/70 to-transparent backdrop-blur-md">
+      <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
 
-        {/* Desktop nav */}
-        <nav className="hidden md:flex items-center gap-1">
-          {NAV_LINKS.map(({ href, label }) => {
-            const isActive = pathname === href
-            return (
-              <Link
-                key={href}
-                href={href}
-                className="text-sm transition-colors px-3 py-1.5 rounded"
-                style={{
-                  color: isActive ? "var(--text-primary)" : "var(--text-secondary)",
-                  background: isActive ? "var(--bg-overlay)" : "transparent",
-                  borderRadius: "var(--radius-md)",
-                  fontWeight: isActive ? 500 : 400,
-                }}
-              >
-                {label}
-              </Link>
-            )
-          })}
-        </nav>
+        {/* LEFT */}
+        <div className="flex items-center gap-8">
 
-        {/* Search + mobile menu */}
-        <div className="flex items-center gap-2">
-          {/* Search button (Phase 2 will wire this up) */}
-          <Link
-            href="/search"
-            className="flex items-center gap-2 transition-colors"
-            style={{
-              background: "var(--bg-elevated)",
-              border: "1px solid var(--border)",
-              borderRadius: "var(--radius-md)",
-              padding: "6px 12px",
-              color: "var(--text-muted)",
-              fontSize: 13,
-            }}
-          >
-            <Search size={14} />
-            <span className="hidden sm:inline">Cari anime...</span>
+          {/* Logo */}
+          <Link href="/" className="text-xl font-bold tracking-wide">
+            <span className="text-red-500">AnimeStream</span>
           </Link>
 
-          {/* Mobile menu toggle */}
-          <button
-            className="flex md:hidden items-center justify-center"
-            style={{
-              width: 36,
-              height: 36,
-              borderRadius: "var(--radius-md)",
-              background: "var(--bg-elevated)",
-              border: "1px solid var(--border)",
-              color: "var(--text-secondary)",
-              cursor: "pointer",
-            }}
-            onClick={() => setMenuOpen(!menuOpen)}
-            aria-label="Toggle menu"
-          >
-            {menuOpen ? <X size={16} /> : <Menu size={16} />}
+          {/* Nav */}
+          <nav className="hidden lg:flex items-center gap-6">
+            {NAV_LINKS.map(({ href, label, icon: Icon }) => {
+              const isActive = pathname === href
+
+              return (
+                <Link
+                  key={href}
+                  href={href}
+                  className="flex items-center gap-2 text-sm group"
+                >
+                  <Icon
+                    size={16}
+                    className={`${
+                      isActive
+                        ? "text-red-500"
+                        : "text-white/60 group-hover:text-white"
+                    }`}
+                  />
+
+                  <span
+                    className={`${
+                      isActive
+                        ? "text-white"
+                        : "text-white/60 group-hover:text-white"
+                    }`}
+                  >
+                    {label}
+                  </span>
+                </Link>
+              )
+            })}
+          </nav>
+        </div>
+
+        {/* RIGHT */}
+        <div className="flex items-center gap-3">
+
+          {/* Search */}
+          <button className="w-9 h-9 flex items-center justify-center rounded-full border border-white/10 bg-white/5 text-white/70 hover:text-white hover:bg-white/10 transition">
+            <Search size={16} />
           </button>
+
+          {/* Sign In */}
+          <Link
+            href="/login"
+            className="text-sm text-white/70 hover:text-white transition"
+          >
+            Sign In
+          </Link>
+
+          {/* Sign Up */}
+          <Link
+            href="/register"
+            className="text-sm px-4 py-1.5 rounded-full bg-red-500 hover:bg-red-600 text-white transition"
+          >
+            Sign Up
+          </Link>
         </div>
       </div>
-
-      {/* Mobile dropdown */}
-      {menuOpen && (
-        <nav
-          className="md:hidden flex flex-col"
-          style={{
-            background: "var(--bg-surface)",
-            borderTop: "1px solid var(--border)",
-            padding: "0.5rem 1.5rem 1rem",
-          }}
-        >
-          {NAV_LINKS.map(({ href, label }) => {
-            const isActive = pathname === href
-            return (
-              <Link
-                key={href}
-                href={href}
-                onClick={() => setMenuOpen(false)}
-                className="py-2.5 text-sm border-b"
-                style={{
-                  color: isActive ? "var(--accent-hover)" : "var(--text-secondary)",
-                  borderColor: "var(--border)",
-                  fontWeight: isActive ? 500 : 400,
-                }}
-              >
-                {label}
-              </Link>
-            )
-          })}
-        </nav>
-      )}
     </header>
   )
 }
