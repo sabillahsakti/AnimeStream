@@ -1,32 +1,35 @@
 import type {
-  HomeResponse,
+  AnimeListItem,
   BatchResponse,
-  ScheduleResponse,
-  GenreResponse,
-  SearchResponse,
   DetailResponse,
+  GenreResponse,
+  HomeResponse,
+  ScheduleResponse,
+  SearchResponse,
   WatchResponse,
 } from "@/lib/types"
 
-const BASE_URL = process.env.ANIMEKOMPI_BASE_URL!
-const TOKEN = process.env.ANIMEKOMPI_TOKEN!
-
-// ─── Core fetcher ─────────────────────────────────────────────────────────────
+const BASE_URL = process.env.ANIMEKOMPI_BASE_URL ?? "https://apinesia.cloud/animekompi"
+const TOKEN = process.env.ANIMEKOMPI_TOKEN
 
 async function apiFetch<T>(path: string, params?: Record<string, string>): Promise<T> {
+  if (!TOKEN) {
+    throw new Error("Missing ANIMEKOMPI_TOKEN environment variable")
+  }
+
   const url = new URL(`${BASE_URL}${path}`)
 
   if (params) {
-    Object.entries(params).forEach(([key, value]) => {
+    for (const [key, value] of Object.entries(params)) {
       url.searchParams.set(key, value)
-    })
+    }
   }
 
   const res = await fetch(url.toString(), {
     headers: {
       Authorization: `Bearer ${TOKEN}`,
     },
-    next: { revalidate: 300 }, // cache 5 minutes
+    next: { revalidate: 300 },
   })
 
   if (!res.ok) {
@@ -36,7 +39,15 @@ async function apiFetch<T>(path: string, params?: Record<string, string>): Promi
   return res.json() as Promise<T>
 }
 
-// ─── Endpoints ────────────────────────────────────────────────────────────────
+export function fromBatchAnime(anime: BatchResponse["data"]["anime"][number]): AnimeListItem {
+  return {
+    slug: anime.slug,
+    title: anime.title,
+    thumbnail: anime.image,
+    type: anime.type,
+    latest_episode: anime.latest_episode || anime.status,
+  }
+}
 
 export async function getHome(page = 1): Promise<HomeResponse> {
   return apiFetch<HomeResponse>("/home", { page: String(page) })

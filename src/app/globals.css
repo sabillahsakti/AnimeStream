@@ -1,178 +1,120 @@
-@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap');
-
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
- 
+
 @custom-variant dark (&:is(.dark *));
 
-/* ─── Design tokens ─────────────────────────────────────────────────────────── */
- 
 :root {
-  --bg-base:       #0a0a0b;
-  --bg-surface:    #111113;
-  --bg-elevated:   #18181b;
-  --bg-overlay:    #1f1f24;
- 
-  --text-primary:  #f0ede8;
-  --text-secondary:#9b9791;
-  --text-muted:    #5c5a57;
- 
-  --accent:        #e84040;
-  --accent-hover:  #ff5252;
-  --accent-dim:    rgba(232, 64, 64, 0.12);
-  --accent-glow:   rgba(232, 64, 64, 0.25);
- 
-  --border:        rgba(255, 255, 255, 0.07);
-  --border-hover:  rgba(255, 255, 255, 0.13);
- 
-  --radius-sm:     4px;
-  --radius-md:     8px;
-  --radius-lg:     12px;
- 
-  --font-display:  'Bebas Neue', sans-serif;
-  --font-body:     'DM Sans', sans-serif;
+  --background: #050506;
+  --foreground: #f8fafc;
+  --card: #111114;
+  --card-foreground: #f8fafc;
+  --popover: #111114;
+  --popover-foreground: #f8fafc;
+  --primary: #e50914;
+  --primary-foreground: #ffffff;
+  --secondary: #1f1f24;
+  --secondary-foreground: #f8fafc;
+  --muted: #1a1a1f;
+  --muted-foreground: #9ca3af;
+  --accent: #e50914;
+  --accent-foreground: #ffffff;
+  --destructive: #ef4444;
+  --border: rgba(255, 255, 255, 0.1);
+  --input: rgba(255, 255, 255, 0.12);
+  --ring: #e50914;
+  --radius: 0.5rem;
+  --surface: #0b0b0d;
+  --surface-2: #141418;
+  --text-dim: #a1a1aa;
+  --text-faint: #71717a;
 }
- 
-/* ─── Base reset ────────────────────────────────────────────────────────────── */
- 
+
 *, *::before, *::after {
   box-sizing: border-box;
-  margin: 0;
-  padding: 0;
 }
- 
+
 html {
   font-size: 16px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   scroll-behavior: smooth;
 }
- 
+
 body {
-  background-color: var(--bg-base);
-  color: var(--text-primary);
-  font-family: var(--font-body);
+  background:
+    radial-gradient(circle at top left, rgba(229, 9, 20, 0.14), transparent 30rem),
+    linear-gradient(180deg, #070708 0%, #050506 45%, #08080a 100%);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
   min-height: 100dvh;
 }
- 
-/* ─── Scrollbar ─────────────────────────────────────────────────────────────── */
- 
+
 ::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: var(--bg-base); }
-::-webkit-scrollbar-thumb { background: var(--bg-overlay); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
- 
-/* ─── Selection ─────────────────────────────────────────────────────────────── */
- 
+::-webkit-scrollbar-track { background: #050506; }
+::-webkit-scrollbar-thumb { background: #2b2b31; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #44444c; }
+
 ::selection {
-  background: var(--accent-dim);
-  color: var(--text-primary);
+  background: rgba(229, 9, 20, 0.28);
+  color: #fff;
 }
- 
-/* ─── Typography utilities ──────────────────────────────────────────────────── */
- 
-.font-display {
-  font-family: var(--font-display);
-  letter-spacing: 0.02em;
+
+.anime-card-hover,
+.media-hover {
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
 }
- 
-/* ─── Card hover effect ─────────────────────────────────────────────────────── */
- 
-.anime-card-hover {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
+
 .anime-card-hover:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5), 0 0 0 1px var(--border-hover);
+  transform: translateY(-6px) scale(1.015);
+  box-shadow: 0 22px 48px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.16);
 }
- 
-/* ─── Gradient overlays ─────────────────────────────────────────────────────── */
- 
+
 .card-overlay {
   background: linear-gradient(
     to top,
-    rgba(0, 0, 0, 0.95) 0%,
-    rgba(0, 0, 0, 0.6) 50%,
+    rgba(0, 0, 0, 0.96) 0%,
+    rgba(0, 0, 0, 0.55) 52%,
     transparent 100%
   );
 }
- 
-/* ─── Shimmer skeleton animation ────────────────────────────────────────────── */
- 
+
 @keyframes shimmer {
-  0%   { background-position: -200% 0; }
+  0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
 }
- 
+
 .skeleton {
-  background: linear-gradient(
-    90deg,
-    var(--bg-elevated) 25%,
-    var(--bg-overlay) 50%,
-    var(--bg-elevated) 75%
-  );
+  background: linear-gradient(90deg, #151519 25%, #222229 50%, #151519 75%);
   background-size: 200% 100%;
   animation: shimmer 1.6s ease-in-out infinite;
 }
- 
-/* ─── Section title underline ───────────────────────────────────────────────── */
- 
-.section-title-line {
-  display: inline-block;
-  position: relative;
-}
-.section-title-line::after {
-  content: '';
-  position: absolute;
-  left: 0; bottom: -6px;
-  width: 2.5rem; height: 3px;
-  background: var(--accent);
-  border-radius: 2px;
-}
- 
-/* ─── Badge variants ────────────────────────────────────────────────────────── */
- 
+
 .badge-type {
-  background: var(--bg-overlay);
-  color: var(--text-secondary);
-  border: 1px solid var(--border);
+  background: rgba(12, 12, 14, 0.78);
+  color: #e4e4e7;
+  border: 1px solid rgba(255, 255, 255, 0.12);
   font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 0.08em;
+  font-weight: 700;
   text-transform: uppercase;
-  padding: 2px 7px;
-  border-radius: var(--radius-sm);
+  padding: 3px 7px;
+  border-radius: 6px;
+  backdrop-filter: blur(10px);
 }
- 
+
 .badge-new {
-  background: var(--accent-dim);
-  color: var(--accent-hover);
-  border: 1px solid rgba(232, 64, 64, 0.2);
+  background: rgba(229, 9, 20, 0.9);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.18);
   font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 0.06em;
+  font-weight: 700;
   text-transform: uppercase;
-  padding: 2px 7px;
-  border-radius: var(--radius-sm);
+  padding: 3px 7px;
+  border-radius: 6px;
 }
- 
-/* ─── Focus visible ─────────────────────────────────────────────────────────── */
- 
+
 :focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid #e50914;
   outline-offset: 2px;
-  border-radius: var(--radius-sm);
-}
- 
-/* ─── Noise texture overlay (decorative) ───────────────────────────────────── */
- 
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
-  opacity: 0.025;
-  pointer-events: none;
-  z-index: 9999;
+  border-radius: 6px;
 }

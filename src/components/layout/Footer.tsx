@@ -2,47 +2,17 @@ import Link from "next/link"
 
 export function Footer() {
   return (
-    <footer
-      style={{
-        borderTop: "1px solid var(--border)",
-        background: "var(--bg-surface)",
-        marginTop: "auto",
-      }}
-    >
-      <div
-        className="mx-auto flex flex-col sm:flex-row items-center justify-between gap-3"
-        style={{ maxWidth: 1280, padding: "1.5rem" }}
-      >
-        {/* Logo */}
-        <span
-          className="font-display text-lg"
-          style={{ color: "var(--text-muted)", letterSpacing: "0.06em" }}
-        >
-          ANI<span style={{ color: "var(--accent)" }}>STREAM</span>
-        </span>
-
-        {/* Links */}
-        <nav className="flex items-center gap-4">
-          {[
-            { href: "/", label: "Home" },
-            { href: "/anime", label: "Anime" },
-            { href: "/schedule", label: "Jadwal" },
-          ].map(({ href, label }) => (
-            <Link
-              key={href}
-              href={href}
-              className="text-xs transition-colors hover:text-white"
-              style={{ color: "var(--text-muted)" }}
-            >
-              {label}
-            </Link>
-          ))}
-        </nav>
-
-        {/* Copyright */}
-        <p className="text-xs" style={{ color: "var(--text-muted)" }}>
-          Subtitle Indonesia · {new Date().getFullYear()}
+    <footer className="border-t border-white/10 bg-[#070708]">
+      <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-8 text-sm text-zinc-500 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+        <p>
+          <span className="font-black text-white">AnimeStream</span> - Subtitle Indonesia
         </p>
+        <nav className="flex flex-wrap gap-4">
+          <Link href="/" className="transition hover:text-white">Home</Link>
+          <Link href="/anime" className="transition hover:text-white">Anime</Link>
+          <Link href="/genre/action" className="transition hover:text-white">Genre</Link>
+          <Link href="/schedule" className="transition hover:text-white">Jadwal</Link>
+        </nav>
       </div>
     </footer>
   )

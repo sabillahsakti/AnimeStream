@@ -1,5 +1,3 @@
-// ─── Shared ───────────────────────────────────────────────────────────────────
-
 export interface AnimeListItem {
   slug: string
   title: string
@@ -7,8 +5,6 @@ export interface AnimeListItem {
   type: string
   latest_episode: string
 }
-
-// ─── Home ─────────────────────────────────────────────────────────────────────
 
 export interface HomeResponse {
   status: string
@@ -18,8 +14,6 @@ export interface HomeResponse {
     anime: AnimeListItem[]
   }
 }
-
-// ─── Batch ────────────────────────────────────────────────────────────────────
 
 export interface BatchAnimeItem {
   slug: string
@@ -40,8 +34,6 @@ export interface BatchResponse {
   }
 }
 
-// ─── Schedule ─────────────────────────────────────────────────────────────────
-
 export interface ScheduleItem {
   slug: string
   title: string
@@ -55,8 +47,6 @@ export interface ScheduleResponse {
   data: Record<string, ScheduleItem[]>
 }
 
-// ─── Genre ────────────────────────────────────────────────────────────────────
-
 export interface GenreResponse {
   status: string
   data: {
@@ -67,8 +57,6 @@ export interface GenreResponse {
   }
 }
 
-// ─── Search ───────────────────────────────────────────────────────────────────
-
 export interface SearchResponse {
   status: string
   data: {
@@ -78,8 +66,6 @@ export interface SearchResponse {
     query: string
   }
 }
-
-// ─── Detail ───────────────────────────────────────────────────────────────────
 
 export interface EpisodeItem {
   slug: string
@@ -115,8 +101,6 @@ export interface DetailResponse {
   status: string
   data: AnimeDetail
 }
-
-// ─── Watch ────────────────────────────────────────────────────────────────────
 
 export interface StreamingServer {
   name: string

@@ -1,103 +1,63 @@
-import { Suspense } from "react"
+import Link from "next/link"
 import { getHome } from "@/lib/api"
 import { AnimeGrid } from "@/components/anime/AnimeGrid"
-import { AnimeGridSkeleton } from "@/components/anime/AnimeCardSkeleton"
-import { Pagination } from "@/components/common/Pagination"
 import { HeroSlider } from "@/components/hero/HeroSlider"
-import { Flame, TrendingUp } from "lucide-react"
+import { Pagination } from "@/components/common/Pagination"
+import { SectionHeader } from "@/components/common/SectionHeader"
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: "AniStream — Nonton Anime Subtitle Indonesia",
+  title: "Nonton Anime Subtitle Indonesia",
 }
 
 interface HomePageProps {
   searchParams: Promise<{ page?: string }>
 }
 
-// 🔥 SECTION (Server Component)
-async function AnimeSection({ page }: { page: number }) {
-  const res = await getHome(page)
-  const { anime, total_pages } = res.data
-
-  const ongoing = anime.filter(
-    (a) =>
-      !a.latest_episode.toLowerCase().includes("batch") &&
-      !a.latest_episode.toLowerCase().includes("completed")
-  )
-
-  const batches = anime.filter(
-    (a) =>
-      a.latest_episode.toLowerCase().includes("batch") ||
-      a.latest_episode.toLowerCase().includes("completed")
-  )
-
-  return (
-    <div className="space-y-16">
-
-      {/* 🔥 Ongoing */}
-      {ongoing.length > 0 && (
-        <section>
-          <div className="flex items-center gap-3 mb-6">
-            <Flame size={18} className="text-red-500" />
-            <h2 className="text-xl md:text-2xl font-semibold text-white tracking-wide">
-              Update Terbaru
-            </h2>
-          </div>
-
-          <AnimeGrid items={ongoing} priorityCount={8} />
-        </section>
-      )}
-
-      {/* 🔥 Batch */}
-      {batches.length > 0 && (
-        <section>
-          <div className="flex items-center gap-3 mb-6">
-            <TrendingUp size={18} className="text-red-500" />
-            <h2 className="text-xl md:text-2xl font-semibold text-white tracking-wide">
-              Batch & Completed
-            </h2>
-          </div>
-
-          <AnimeGrid items={batches} />
-        </section>
-      )}
-
-      {/* 🔥 Pagination */}
-      <Pagination currentPage={page} totalPages={total_pages} />
-    </div>
-  )
-}
-
-// 🔥 PAGE (Server Component)
 export default async function HomePage({ searchParams }: HomePageProps) {
   const params = await searchParams
   const page = Math.max(1, Number(params.page) || 1)
-
-  // 🔥 FETCH DATA SEKALI (biar efisien)
   const res = await getHome(page)
-  const { anime } = res.data
+  const { anime, total_pages } = res.data
 
-  const ongoing = anime.filter(
-    (a) =>
-      !a.latest_episode.toLowerCase().includes("batch") &&
-      !a.latest_episode.toLowerCase().includes("completed")
-  )
-
-  // 🔥 ambil 5 buat hero
-  const heroItems = ongoing.slice(0, 5)
+  const ongoing = anime.filter((item) => !/batch|completed/i.test(item.latest_episode))
+  const completed = anime.filter((item) => /batch|completed/i.test(item.latest_episode))
 
   return (
-    <div className="bg-black text-white">
+    <div>
+      <HeroSlider items={ongoing.length ? ongoing : anime} />
 
-      {/* 🔥 HERO SLIDER */}
-      <HeroSlider items={heroItems} />
+      <main className="mx-auto max-w-7xl space-y-14 px-4 py-12 sm:px-6">
+        <section>
+          <SectionHeader
+            eyebrow="Baru ditambahkan"
+            title="Update episode terbaru"
+            action={
+              <Link href="/schedule" className="text-sm font-semibold text-zinc-300 transition hover:text-white">
+                Lihat jadwal
+              </Link>
+            }
+          />
+          <AnimeGrid items={ongoing} getHref={(anime) => `/watch/${anime.slug}`} priorityCount={8} />
+        </section>
 
-      {/* 🔥 CONTENT */}
-      <main className="max-w-7xl mx-auto px-6 py-12">
-        <Suspense fallback={<AnimeGridSkeleton count={20} />}>
-          <AnimeSection page={page} />
-        </Suspense>
+        {completed.length > 0 ? (
+          <section>
+            <SectionHeader
+              eyebrow="Maraton"
+              title="Batch dan completed"
+              description="Judul yang sudah lengkap untuk ditonton berurutan."
+              action={
+                <Link href="/anime" className="text-sm font-semibold text-zinc-300 transition hover:text-white">
+                  Browse semua
+                </Link>
+              }
+            />
+            <AnimeGrid items={completed} />
+          </section>
+        ) : null}
+
+        <Pagination currentPage={page} totalPages={total_pages} />
       </main>
     </div>
   )

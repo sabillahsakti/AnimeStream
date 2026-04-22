@@ -1,103 +1,97 @@
-"use client";
+"use client"
 
-import { useEffect, useState } from "react";
-import Link from "next/link";
-import type { AnimeListItem } from "@/lib/types";
+import { useEffect, useMemo, useState } from "react"
+import Image from "next/image"
+import Link from "next/link"
+import { Info, Play } from "lucide-react"
+import type { AnimeListItem } from "@/lib/types"
 
-interface Props {
-  items: AnimeListItem[];
+interface HeroSliderProps {
+  items: AnimeListItem[]
 }
 
-function formatTitle(title: string) {
-  return title.replace(/episode\s*\d+/i, "").trim();
+function cleanTitle(title: string) {
+  return title
+    .replace(/episode\s*[\w\s-]+subtitle indonesia/gi, "")
+    .replace(/subtitle indonesia/gi, "")
+    .trim()
 }
 
-export function HeroSlider({ items }: Props) {
-  const [index, setIndex] = useState(0);
-  const [paused, setPaused] = useState(false);
+export function HeroSlider({ items }: HeroSliderProps) {
+  const [index, setIndex] = useState(0)
+  const slides = useMemo(() => items.slice(0, 5), [items])
 
   useEffect(() => {
-    if (paused || items.length === 0) return;
+    if (slides.length <= 1) return
+    const interval = window.setInterval(() => {
+      setIndex((current) => (current + 1) % slides.length)
+    }, 5500)
 
-    const interval = setInterval(() => {
-      setIndex((prev) => (prev + 1) % items.length);
-    }, 4000);
+    return () => window.clearInterval(interval)
+  }, [slides.length])
 
-    return () => clearInterval(interval);
-  }, [paused, items.length]);
+  const active = slides[index]
 
-  const active = items[index];
-
-  if (!active) return null;
+  if (!active) return null
 
   return (
-    <section
-      className="relative h-[75vh] w-full overflow-hidden"
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
-    >
-      {/* Blur background */}
-      <div
-        className="absolute inset-0 bg-cover bg-center scale-110 blur-2xl opacity-40"
-        style={{ backgroundImage: `url(${active.thumbnail})` }}
-      />
-
-      {/* Main image */}
-      <img
+    <section className="relative min-h-[620px] overflow-hidden bg-black md:min-h-[720px]">
+      <Image
         src={active.thumbnail}
-        className="absolute inset-0 w-full h-full object-cover opacity-80"
         alt={active.title}
+        fill
+        priority
+        unoptimized
+        sizes="100vw"
+        className="object-cover opacity-70 transition duration-700"
       />
+      <div className="absolute inset-0 bg-[linear-gradient(90deg,#050506_0%,rgba(5,5,6,.9)_28%,rgba(5,5,6,.35)_58%,rgba(5,5,6,.82)_100%)]" />
+      <div className="absolute inset-0 bg-[linear-gradient(0deg,#050506_0%,rgba(5,5,6,.12)_38%,rgba(5,5,6,.22)_100%)]" />
 
-      {/* Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-r from-black via-black/70 to-transparent" />
-      <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
-
-      {/* Content */}
-      <div className="relative z-10 h-full flex items-end max-w-7xl mx-auto px-6 pb-16">
-        <div className="max-w-xl">
-          <span className="text-xs text-red-500 uppercase tracking-widest">
-            Ongoing
-          </span>
-
-          <h1 className="text-4xl md:text-6xl font-bold mt-2">
-            {formatTitle(active.title)}
+      <div className="relative z-10 mx-auto flex min-h-[620px] max-w-7xl items-end px-4 pb-20 pt-32 sm:px-6 md:min-h-[720px] md:pb-28">
+        <div className="max-w-3xl">
+          <div className="mb-4 flex flex-wrap items-center gap-2">
+            <span className="badge-new">Update terbaru</span>
+            <span className="badge-type">{active.type}</span>
+            <span className="badge-type">{active.latest_episode}</span>
+          </div>
+          <h1 className="max-w-3xl text-4xl font-black leading-[0.95] text-white sm:text-6xl lg:text-7xl">
+            {cleanTitle(active.title)}
           </h1>
-
-          <p className="mt-3 text-white/60 text-sm">
-            {active.type} • Streaming Anime
+          <p className="mt-5 max-w-xl text-base leading-7 text-zinc-300">
+            Streaming anime subtitle Indonesia dengan pilihan episode terbaru, detail anime, dan link download dalam satu tempat.
           </p>
-
-          <div className="mt-6 flex gap-3">
+          <div className="mt-8 flex flex-wrap gap-3">
             <Link
-              href={`/anime/${active.slug}`}
-              className="px-6 py-3 bg-red-500 hover:bg-red-600 rounded-lg font-medium"
+              href={`/watch/${active.slug}`}
+              className="inline-flex h-11 items-center gap-2 rounded-md bg-white px-5 text-sm font-bold text-black transition hover:bg-zinc-200"
             >
-              Watch Now
+              <Play className="size-4 fill-black" />
+              Mulai nonton
             </Link>
-
             <Link
-              href={`/anime/${active.slug}`}
-              className="px-6 py-3 bg-white/10 hover:bg-white/20 rounded-lg"
+              href={`/watch/${active.slug}`}
+              className="inline-flex h-11 items-center gap-2 rounded-md bg-white/[0.14] px-5 text-sm font-bold text-white ring-1 ring-white/[0.12] backdrop-blur transition hover:bg-white/20"
             >
-              Detail
+              <Info className="size-4" />
+              Info episode
             </Link>
           </div>
         </div>
       </div>
 
-      {/* Indicators */}
-      <div className="absolute bottom-6 right-6 flex gap-2">
-        {items.map((_, i) => (
+      <div className="absolute bottom-8 right-4 z-20 flex gap-2 sm:right-6">
+        {slides.map((item, slideIndex) => (
           <button
-            key={i}
-            onClick={() => setIndex(i)}
+            key={item.slug}
+            onClick={() => setIndex(slideIndex)}
             className={`h-1.5 rounded-full transition-all ${
-              i === index ? "w-6 bg-red-500" : "w-3 bg-white/40"
+              slideIndex === index ? "w-10 bg-red-600" : "w-4 bg-white/35 hover:bg-white/60"
             }`}
+            aria-label={`Slide ${slideIndex + 1}`}
           />
         ))}
       </div>
     </section>
-  );
+  )
 }

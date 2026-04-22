@@ -1,6 +1,6 @@
 "use client"
 
-import { useRouter, useSearchParams, usePathname } from "next/navigation"
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 
 interface PaginationProps {
@@ -16,107 +16,60 @@ export function Pagination({ currentPage, totalPages }: PaginationProps) {
   if (totalPages <= 1) return null
 
   function goToPage(page: number) {
+    const safePage = Math.min(Math.max(page, 1), totalPages)
     const params = new URLSearchParams(searchParams.toString())
-    params.set("page", String(page))
+    params.set("page", String(safePage))
     router.push(`${pathname}?${params.toString()}`)
   }
 
-  // Build visible page numbers: always show first, last, current ±1
   const pages: (number | "...")[] = []
-  const delta = 1
+  const start = Math.max(1, currentPage - 1)
+  const end = Math.min(totalPages, currentPage + 1)
 
-  const range = Array.from({ length: totalPages }, (_, i) => i + 1).filter(
-    (p) =>
-      p === 1 ||
-      p === totalPages ||
-      Math.abs(p - currentPage) <= delta
-  )
-
-  range.forEach((p, i) => {
-    if (i > 0 && p - (range[i - 1] as number) > 1) {
-      pages.push("...")
-    }
-    pages.push(p)
-  })
+  if (start > 1) pages.push(1)
+  if (start > 2) pages.push("...")
+  for (let page = start; page <= end; page += 1) pages.push(page)
+  if (end < totalPages - 1) pages.push("...")
+  if (end < totalPages) pages.push(totalPages)
 
   return (
-    <nav
-      className="flex items-center justify-center gap-1"
-      aria-label="Pagination"
-    >
-      {/* Prev button */}
+    <nav className="flex items-center justify-center gap-2 pt-4" aria-label="Pagination">
       <button
         onClick={() => goToPage(currentPage - 1)}
         disabled={currentPage <= 1}
-        className="flex items-center justify-center transition-colors"
-        style={{
-          width: 36,
-          height: 36,
-          borderRadius: "var(--radius-md)",
-          background: "var(--bg-elevated)",
-          border: "1px solid var(--border)",
-          color: currentPage <= 1 ? "var(--text-muted)" : "var(--text-secondary)",
-          cursor: currentPage <= 1 ? "not-allowed" : "pointer",
-        }}
-        aria-label="Previous page"
+        className="grid size-9 place-items-center rounded-md border border-white/10 bg-white/[0.04] text-zinc-300 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
+        aria-label="Halaman sebelumnya"
       >
-        <ChevronLeft size={16} />
+        <ChevronLeft className="size-4" />
       </button>
 
-      {/* Page numbers */}
-      {pages.map((p, i) =>
-        p === "..." ? (
-          <span
-            key={`ellipsis-${i}`}
-            className="flex items-center justify-center"
-            style={{
-              width: 36,
-              height: 36,
-              color: "var(--text-muted)",
-              fontSize: 13,
-            }}
-          >
-            …
+      {pages.map((page, index) =>
+        page === "..." ? (
+          <span key={`ellipsis-${index}`} className="grid size-9 place-items-center text-sm text-zinc-500">
+            ...
           </span>
         ) : (
           <button
-            key={p}
-            onClick={() => goToPage(p as number)}
-            style={{
-              width: 36,
-              height: 36,
-              borderRadius: "var(--radius-md)",
-              background: p === currentPage ? "var(--accent)" : "var(--bg-elevated)",
-              border: p === currentPage ? "1px solid transparent" : "1px solid var(--border)",
-              color: p === currentPage ? "#fff" : "var(--text-secondary)",
-              cursor: "pointer",
-              fontSize: 13,
-              fontWeight: p === currentPage ? 600 : 400,
-              transition: "background 0.15s, color 0.15s",
-            }}
+            key={page}
+            onClick={() => goToPage(page)}
+            className={`size-9 rounded-md border text-sm font-semibold transition ${
+              page === currentPage
+                ? "border-red-500 bg-red-600 text-white"
+                : "border-white/10 bg-white/[0.04] text-zinc-300 hover:bg-white/10"
+            }`}
           >
-            {p}
+            {page}
           </button>
         )
       )}
 
-      {/* Next button */}
       <button
         onClick={() => goToPage(currentPage + 1)}
         disabled={currentPage >= totalPages}
-        className="flex items-center justify-center transition-colors"
-        style={{
-          width: 36,
-          height: 36,
-          borderRadius: "var(--radius-md)",
-          background: "var(--bg-elevated)",
-          border: "1px solid var(--border)",
-          color: currentPage >= totalPages ? "var(--text-muted)" : "var(--text-secondary)",
-          cursor: currentPage >= totalPages ? "not-allowed" : "pointer",
-        }}
-        aria-label="Next page"
+        className="grid size-9 place-items-center rounded-md border border-white/10 bg-white/[0.04] text-zinc-300 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
+        aria-label="Halaman berikutnya"
       >
-        <ChevronRight size={16} />
+        <ChevronRight className="size-4" />
       </button>
     </nav>
   )
