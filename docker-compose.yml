@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  nextjs:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nextjs-app
+    ports:
+      - "3000:3000"
+    restart: always
+    environment:
+      - NODE_ENV=production
+      # Tambahkan env vars lainnya jika diperlukan
+      # - DATABASE_URL=...
+      # - API_KEY=...
+    volumes:
+      # Optional: untuk development yang lebih dynamic
+      # - .:/app
+      # - /app/node_modules
+    networks:
+      - nextjs-network
+    # Uncomment jika ingin lihat logs
+    # logging:
+    #   driver: "json-file"
+    #   options:
+    #     max-size: "10m"
+    #     max-file: "3"
+
+  nginx:
+    image: nginx:alpine
+    container_name: nextjs-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro  # Untuk SSL certificate
+      - ./certbot/conf:/etc/letsencrypt:ro
+      - ./certbot/www:/var/www/certbot:ro
+    depends_on:
+      - nextjs
+    restart: always
+    networks:
+      - nextjs-network
+
+networks:
+  nextjs-network:
+    driver: bridge
